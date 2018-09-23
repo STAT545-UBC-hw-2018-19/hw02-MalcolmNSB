@@ -19,8 +19,6 @@ In this section we determine some basic attributes of `gapminder`.
 ```{r}
 typeof(gapminder)
 head(gapminder)
-summary(gapminder)
-typeof(gapminder)
 ```
  
  
@@ -43,22 +41,18 @@ nrow(gapminder)
  
  - Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?
  
- The `ncol` and `nrow` functions return the number of columns and rows, respectively, of `gapminder`. We can also extract the same information by using the `str` function,
+We can also determine both the class and the number of rows & columns (among other information) by using the `str` function,
 ```{r}
 str(gapminder)
 ```
- which also displays the class of gapminder.
+ which also displays the class(es) of gapminder and the number of rows & columns.
  
  - What data type is each variable?
-```{r}
+ 
+ From above, we see that the continent and country variables are characters, year and population are integers, and life expectancy and gdp per capita are numerical (double).
 
-```
  
  
-
-```{r cars}
-summary(cars)
-```
 
 ## Including Plots
 

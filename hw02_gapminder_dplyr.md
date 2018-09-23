@@ -46,33 +46,6 @@ head(gapminder)
     ## 5 Afghanistan Asia       1972    36.1 13079460      740.
     ## 6 Afghanistan Asia       1977    38.4 14880372      786.
 
-``` r
-summary(gapminder)
-```
-
-    ##         country        continent        year         lifeExp     
-    ##  Afghanistan:  12   Africa  :624   Min.   :1952   Min.   :23.60  
-    ##  Albania    :  12   Americas:300   1st Qu.:1966   1st Qu.:48.20  
-    ##  Algeria    :  12   Asia    :396   Median :1980   Median :60.71  
-    ##  Angola     :  12   Europe  :360   Mean   :1980   Mean   :59.47  
-    ##  Argentina  :  12   Oceania : 24   3rd Qu.:1993   3rd Qu.:70.85  
-    ##  Australia  :  12                  Max.   :2007   Max.   :82.60  
-    ##  (Other)    :1632                                                
-    ##       pop              gdpPercap       
-    ##  Min.   :6.001e+04   Min.   :   241.2  
-    ##  1st Qu.:2.794e+06   1st Qu.:  1202.1  
-    ##  Median :7.024e+06   Median :  3531.8  
-    ##  Mean   :2.960e+07   Mean   :  7215.3  
-    ##  3rd Qu.:1.959e+07   3rd Qu.:  9325.5  
-    ##  Max.   :1.319e+09   Max.   :113523.1  
-    ## 
-
-``` r
-typeof(gapminder)
-```
-
-    ## [1] "list"
-
 -   What is its class?
 
 ``` r
@@ -99,7 +72,7 @@ nrow(gapminder)
 
 -   Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?
 
-The `ncol` and `nrow` functions return the number of columns and rows, respectively, of `gapminder`. We can also extract the same information by using the `str` function,
+We can also determine both the class and the number of rows & columns (among other information) by using the `str` function,
 
 ``` r
 str(gapminder)
@@ -113,21 +86,11 @@ str(gapminder)
     ##  $ pop      : int  8425333 9240934 10267083 11537966 13079460 14880372 12881816 13867957 16317921 22227415 ...
     ##  $ gdpPercap: num  779 821 853 836 740 ...
 
-which also displays the class of gapminder.
+which also displays the class(es) of gapminder and the number of rows & columns.
 
 -   What data type is each variable?
 
-``` r
-summary(cars)
-```
-
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
+From above, we see that the continent and country variables are characters, year and population are integers, and life expectancy and gdp per capita are numerical (double).
 
 Including Plots
 ---------------
