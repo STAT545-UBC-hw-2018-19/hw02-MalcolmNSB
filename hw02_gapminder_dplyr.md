@@ -54,6 +54,8 @@ class(gapminder)
 
     ## [1] "tbl_df"     "tbl"        "data.frame"
 
+We see that `gapminder` is a data.frame, a tibble (`tbl`), and a tibble dataframe (`tbl_df`).
+
 -   How many variables/columns?
 
 ``` r
@@ -72,7 +74,7 @@ nrow(gapminder)
 
 -   Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?
 
-We can also determine both the class and the number of rows & columns (among other information) by using the `str` function,
+We can determine both the class and the number of rows & columns (among other information) of `gapminder` by using the `str` function,
 
 ``` r
 str(gapminder)
@@ -90,13 +92,101 @@ which also displays the class(es) of gapminder and the number of rows & columns.
 
 -   What data type is each variable?
 
-From above, we see that the continent and country variables are characters, year and population are integers, and life expectancy and gdp per capita are numerical (double).
+1.  Continent and country: `character`
+2.  Year and population: `integer`
+3.  Life expectancy and GDP per capita: `numerical` (double)
 
-Including Plots
----------------
+Exploring a variable
+--------------------
 
-You can also embed plots, for example:
+We shall pick,
 
-![](hw02_gapminder_dplyr_files/figure-markdown_github/pressure-1.png)
+Categorical variable: `continent`. Quantitative variable: `pop`(population).
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+-   What are possible values (or range, whichever is appropriate) of each variable?
+
+``` r
+distinct(select(gapminder, continent))
+```
+
+    ## # A tibble: 5 x 1
+    ##   continent
+    ##   <fct>    
+    ## 1 Asia     
+    ## 2 Europe   
+    ## 3 Africa   
+    ## 4 Americas 
+    ## 5 Oceania
+
+``` r
+range(select(gapminder, pop))
+```
+
+    ## [1]      60011 1318683096
+
+-   What values are typical? What’s the spread? What’s the distribution? Etc., tailored to the variable at hand.
+
+``` r
+gapminder %>% 
+  select(pop) %>% 
+  summary()
+```
+
+    ##       pop           
+    ##  Min.   :6.001e+04  
+    ##  1st Qu.:2.794e+06  
+    ##  Median :7.024e+06  
+    ##  Mean   :2.960e+07  
+    ##  3rd Qu.:1.959e+07  
+    ##  Max.   :1.319e+09
+
+Plots
+-----
+
+Let's explore population visually, using log-scale.
+
+``` r
+ggplot(gapminder, aes(pop)) +
+  scale_x_log10() +
+  geom_histogram(aes(y=..density..), fill = "green") +
+  geom_density()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+Scatter plot of population with life expectancy:
+
+``` r
+ggplot(gapminder, aes(lifeExp,pop))+
+  geom_point() +
+  scale_y_log10()
+```
+
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-10-1.png)
+
+Here is a violin plot overlayed with a jitter plot for life expectancy across continents:
+
+``` r
+gapminder %>% 
+  select(continent, lifeExp) %>% 
+  ggplot(aes(continent, lifeExp)) +
+  geom_violin() +
+  geom_jitter(alpha = 0.2)
+```
+
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+In the following, we create a (log) plot of population across multiple years in Oceania, and Canada.
+
+``` r
+gapminder %>% 
+  filter(continent == "Oceania" | country == "Canada") %>% 
+  select(country, year,  pop) %>% 
+  ggplot(aes(year, pop, shape = country)) +
+  scale_y_log10() +
+  geom_point()
+```
+
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-12-1.png)
