@@ -1,0 +1,71 @@
+---
+title: "Exploring the gapminder using dplyr and ggplot2"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this document, we will be exploring the `gapminder` dataset using (among other tools) the `dplyr` and `ggplot2` functions. First we load the gapminder dataset and dplyr using the tidyverse package.
+```{r}
+library(gapminder)
+library(tidyverse)
+```
+##Smell test the data
+In this section we determine some basic attributes of `gapminder`.
+
+ - Is it a data.frame, a matrix, a vector, a list?
+```{r}
+typeof(gapminder)
+head(gapminder)
+summary(gapminder)
+typeof(gapminder)
+```
+ 
+ 
+ - What is its class?
+```{r}
+class(gapminder)
+```
+ 
+ - How many variables/columns?
+```{r}
+ncol(gapminder)
+```
+ 
+ 
+ - How many rows/observations?
+ 
+```{r}
+nrow(gapminder)
+```
+ 
+ - Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?
+ 
+ The `ncol` and `nrow` functions return the number of columns and rows, respectively, of `gapminder`. We can also extract the same information by using the `str` function,
+```{r}
+str(gapminder)
+```
+ which also displays the class of gapminder.
+ 
+ - What data type is each variable?
+```{r}
+
+```
+ 
+ 
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
