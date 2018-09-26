@@ -4,6 +4,7 @@ Exploring gapminder using dplyr and ggplot2
 In this document, we will be exploring the gapminder dataset using (among other tools) the `dplyr` and `ggplot` functions. First we load the gapminder dataset and the tidyverse package.
 
 ``` r
+#load gapminder and tidyverse
 library(gapminder)
 library(tidyverse)
 ```
@@ -27,6 +28,7 @@ In this section we determine some basic attributes of `gapminder`.
 -   Is it a data.frame, a matrix, a vector, a list?
 
 ``` r
+#We can use the is.[datatype] to determine what gapminder is
 is.data.frame(gapminder)
 ```
 
@@ -106,6 +108,7 @@ Exploring a variable
 -   What are possible values (or range, whichever is appropriate) of each variable? For continent, population, and lifeExp, we have
 
 ``` r
+#picks out the distinct continents from the continent column in gapminder
 distinct(select(gapminder, continent))
 ```
 
@@ -119,6 +122,7 @@ distinct(select(gapminder, continent))
     ## 5 Oceania
 
 ``` r
+#finds the numerical range of the chosen numerical column
 range(select(gapminder, pop))
 ```
 
@@ -135,6 +139,7 @@ range(select(gapminder, lifeExp))
 We can use the summary function to give basic statistical information about the population and life expectancy
 
 ``` r
+#select the population and life expectancy columns of gapminder and give a summary of them 
 gapminder %>% 
   select(pop, lifeExp) %>% 
   summary()
@@ -156,6 +161,7 @@ Plots
 Let's explore population visually, using a log-scale histogram.
 
 ``` r
+#plot population histogram scaled according to density, and plot density on top
 ggplot(gapminder, aes(pop)) +
   scale_x_log10() +
   geom_histogram(aes(y=..density..), fill = "green") +
@@ -169,6 +175,7 @@ ggplot(gapminder, aes(pop)) +
 Next, let's see how population varies with life expectancy across the five continents.
 
 ``` r
+#plots population on a log scale as a function of life expectancy for each continent
 ggplot(gapminder, aes(lifeExp,pop))+
   geom_point(aes(colour=continent), alpha = 0.2) +
   scale_y_log10() +
@@ -182,8 +189,10 @@ We see that in all continents and all countries in those continents, there appea
 Here is a violin plot overlayed with a jitter plot for life expectancy across continents:
 
 ``` r
+#select continent and life expectancy
 gapminder %>% 
   select(continent, lifeExp) %>% 
+  #plot violin and jitter plots, colouring by continent
   ggplot(aes(continent, lifeExp)) +
   geom_violin() +
   geom_jitter(aes(colour = continent), alpha = 0.3)
@@ -194,9 +203,12 @@ gapminder %>%
 In the following, we would like to see a comparison between rate of population growth over the years in Canada, Australia, and New Zealand.
 
 ``` r
+#filter gapminder according to Oceania and Canada
 gapminder %>% 
   filter(continent == "Oceania" | country == "Canada") %>% 
+  #select country year and population
   select(country, year,  pop) %>% 
+  #plot population of each country on a log scale as a function of year, and make a linear fit
   ggplot(aes(year, pop, shape = country)) +
   scale_y_log10() +
   geom_point() +
@@ -238,6 +250,7 @@ gapminder %>%
 The `rename` command as suggested allows you to rename columns.
 
 ``` r
+#create new data.frame called gpmdr that has a renamed column "NewName""
 gpmdr <- gapminder %>% 
   rename("NewName"= "lifeExp")
 ```
@@ -245,6 +258,7 @@ gpmdr <- gapminder %>%
 The `mutate` command allows you to create new variable from existing ones and add it to the data.frame.
 
 ``` r
+#Add a new column "lifeExp_with_chocolate_cake" to gapminder
 gapminder %>% 
   mutate(lifeExp_with_chocolate_cake = lifeExp + 20)
 ```
