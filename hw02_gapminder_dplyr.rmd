@@ -17,10 +17,13 @@ In this section we determine some basic attributes of `gapminder`.
 
  * Is it a data.frame, a matrix, a vector, a list?
 ```{r}
-typeof(gapminder)
-head(gapminder)
+
+is.data.frame(gapminder)
+is.matrix(gapminder)
+is.vector(gapminder)
+is.list(gapminder)
 ```
- 
+ We see that `gapminder` is a data.frame and a list, but it is not a matrix or a vector.
  
  * What is its class?
 ```{r}
@@ -42,36 +45,36 @@ nrow(gapminder)
  
  * Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?
  
-We can determine both the class and the number of rows & columns (among other information) of `gapminder` by using the `str` function,
+We can determine both the class and the number of rows & columns (among other information) of `gapminder` another way by using, for example, the `str` function,
 ```{r}
 str(gapminder)
 ```
  which also displays the class(es) of gapminder and the number of rows & columns.
  
  * What data type is each variable?
-   1. Continent and country: `character`
-   2. Year and population: `integer`
-   3. Life expectancy and GDP per capita: `numerical` (double)
+ 
+ From above, we read off that *continent* and *country* are of `factor` type, *year* and *population* are `integer`, and *life expectancy* and *Gdp per capita* are `numerical`.
  
 
 
  
 ## Exploring a variable
-We shall pick,
+We shall pick, continent as a categorical variable and population as a quantitative one.
 
-Categorical variable: `continent`.
-Quantitative variable: `pop`(population).
 
 * What are possible values (or range, whichever is appropriate) of each variable?
 ```{r}
 distinct(select(gapminder, continent))
 range(select(gapminder, pop))
+range(select(gapminder, lifeExp))
 ```
 
 * What values are typical? What’s the spread? What’s the distribution? Etc., tailored to the variable at hand.
+
+We can use the summary function to give basic statistical information about the population and life expectancy
 ```{r}
 gapminder %>% 
-  select(pop) %>% 
+  select(pop, lifeExp) %>% 
   summary()
 ```
 ## Plots
@@ -84,12 +87,14 @@ ggplot(gapminder, aes(pop)) +
   geom_density()
 ```
 
-Scatter plot of population with life expectancy:
+Scatter plot of population with life expectancy across the five continents:
 ```{r}
 ggplot(gapminder, aes(lifeExp,pop))+
-  geom_point() +
-  scale_y_log10()
+  geom_point(aes(colour=continent), alpha = 0.2) +
+  scale_y_log10() +
+  facet_wrap(~ continent)
 ```
+We see that in all continents and all countries in those continents, there appears to be a linear relation between population and life expectancy.
 
 Here is a violin plot overlayed with a jitter plot for life expectancy across continents:
 
@@ -98,17 +103,18 @@ gapminder %>%
   select(continent, lifeExp) %>% 
   ggplot(aes(continent, lifeExp)) +
   geom_violin() +
-  geom_jitter(alpha = 0.2)
+  geom_jitter(aes(colour = continent), alpha = 0.3)
   
 ```
 
-In the following, we create a (log) plot of population across multiple years in Oceania, and Canada.
+In the following, we create a (log) plot of population across multiple years in Austraila, New Zealand, and Canada.
 ```{r}
 gapminder %>% 
   filter(continent == "Oceania" | country == "Canada") %>% 
   select(country, year,  pop) %>% 
   ggplot(aes(year, pop, shape = country)) +
   scale_y_log10() +
-  geom_point()
+  geom_point() +
+  geom_smooth(method ="lm")
 ```
-
+Here we see from a linear regression fit that the populations of Australia and Canada across the sampled years were increasing at about the same rate, while the population growth in New Zealand was slightly slower.

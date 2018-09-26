@@ -1,4 +1,4 @@
-Exploring the gapminder using dplyr and ggplot2
+Exploring gapminder using dplyr and ggplot2
 ================
 
 In this document, we will be exploring the `gapminder` dataset using (among other tools) the `dplyr` and `ggplot2` functions. First we load the gapminder dataset and dplyr using the tidyverse package.
@@ -27,24 +27,30 @@ In this section we determine some basic attributes of `gapminder`.
 -   Is it a data.frame, a matrix, a vector, a list?
 
 ``` r
-typeof(gapminder)
+is.data.frame(gapminder)
 ```
 
-    ## [1] "list"
+    ## [1] TRUE
 
 ``` r
-head(gapminder)
+is.matrix(gapminder)
 ```
 
-    ## # A tibble: 6 x 6
-    ##   country     continent  year lifeExp      pop gdpPercap
-    ##   <fct>       <fct>     <int>   <dbl>    <int>     <dbl>
-    ## 1 Afghanistan Asia       1952    28.8  8425333      779.
-    ## 2 Afghanistan Asia       1957    30.3  9240934      821.
-    ## 3 Afghanistan Asia       1962    32.0 10267083      853.
-    ## 4 Afghanistan Asia       1967    34.0 11537966      836.
-    ## 5 Afghanistan Asia       1972    36.1 13079460      740.
-    ## 6 Afghanistan Asia       1977    38.4 14880372      786.
+    ## [1] FALSE
+
+``` r
+is.vector(gapminder)
+```
+
+    ## [1] FALSE
+
+``` r
+is.list(gapminder)
+```
+
+    ## [1] TRUE
+
+We see that `gapminder` is a data.frame and a list, but it is not a matrix or a vector.
 
 -   What is its class?
 
@@ -74,7 +80,7 @@ nrow(gapminder)
 
 -   Can you get these facts about “extent” or “size” in more than one way? Can you imagine different functions being useful in different contexts?
 
-We can determine both the class and the number of rows & columns (among other information) of `gapminder` by using the `str` function,
+We can determine both the class and the number of rows & columns (among other information) of `gapminder` another way by using, for example, the `str` function,
 
 ``` r
 str(gapminder)
@@ -92,16 +98,12 @@ which also displays the class(es) of gapminder and the number of rows & columns.
 
 -   What data type is each variable?
 
-1.  Continent and country: `character`
-2.  Year and population: `integer`
-3.  Life expectancy and GDP per capita: `numerical` (double)
+From above, we read off that *continent* and *country* are of `factor` type, *year* and *population* are `integer`, and *life expectancy* and *Gdp per capita* are `numerical`.
 
 Exploring a variable
 --------------------
 
-We shall pick,
-
-Categorical variable: `continent`. Quantitative variable: `pop`(population).
+We shall pick, continent as a categorical variable and population as a quantitative one.
 
 -   What are possible values (or range, whichever is appropriate) of each variable?
 
@@ -124,21 +126,29 @@ range(select(gapminder, pop))
 
     ## [1]      60011 1318683096
 
+``` r
+range(select(gapminder, lifeExp))
+```
+
+    ## [1] 23.599 82.603
+
 -   What values are typical? What’s the spread? What’s the distribution? Etc., tailored to the variable at hand.
+
+We can use the summary function to give basic statistical information about the population and life expectancy
 
 ``` r
 gapminder %>% 
-  select(pop) %>% 
+  select(pop, lifeExp) %>% 
   summary()
 ```
 
-    ##       pop           
-    ##  Min.   :6.001e+04  
-    ##  1st Qu.:2.794e+06  
-    ##  Median :7.024e+06  
-    ##  Mean   :2.960e+07  
-    ##  3rd Qu.:1.959e+07  
-    ##  Max.   :1.319e+09
+    ##       pop               lifeExp     
+    ##  Min.   :6.001e+04   Min.   :23.60  
+    ##  1st Qu.:2.794e+06   1st Qu.:48.20  
+    ##  Median :7.024e+06   Median :60.71  
+    ##  Mean   :2.960e+07   Mean   :59.47  
+    ##  3rd Qu.:1.959e+07   3rd Qu.:70.85  
+    ##  Max.   :1.319e+09   Max.   :82.60
 
 Plots
 -----
@@ -156,15 +166,16 @@ ggplot(gapminder, aes(pop)) +
 
 ![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
-Scatter plot of population with life expectancy:
+Scatter plot of population with life expectancy across the five continents:
 
 ``` r
 ggplot(gapminder, aes(lifeExp,pop))+
-  geom_point() +
-  scale_y_log10()
+  geom_point(aes(colour=continent), alpha = 0.2) +
+  scale_y_log10() +
+  facet_wrap(~ continent)
 ```
 
-![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-10-1.png) We see that in all continents and all countries in those continents, there appears to be a linear relation between population and life expectancy.
 
 Here is a violin plot overlayed with a jitter plot for life expectancy across continents:
 
@@ -173,12 +184,12 @@ gapminder %>%
   select(continent, lifeExp) %>% 
   ggplot(aes(continent, lifeExp)) +
   geom_violin() +
-  geom_jitter(alpha = 0.2)
+  geom_jitter(aes(colour = continent), alpha = 0.3)
 ```
 
 ![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
-In the following, we create a (log) plot of population across multiple years in Oceania, and Canada.
+In the following, we create a (log) plot of population across multiple years in Austraila, New Zealand, and Canada.
 
 ``` r
 gapminder %>% 
@@ -186,7 +197,8 @@ gapminder %>%
   select(country, year,  pop) %>% 
   ggplot(aes(year, pop, shape = country)) +
   scale_y_log10() +
-  geom_point()
+  geom_point() +
+  geom_smooth(method ="lm")
 ```
 
-![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-12-1.png) Here we see from a linear regression fit that the populations of Australia and Canada across the sampled years were increasing at about the same rate, while the population growth in New Zealand was slightly slower.
