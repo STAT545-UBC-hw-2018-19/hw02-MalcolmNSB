@@ -7,8 +7,8 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-In this document, we will be exploring the `gapminder` dataset using (among other tools) the `dplyr` and `ggplot2` functions. First we load the gapminder dataset and dplyr using the tidyverse package.
-```{r}
+In this document, we will be exploring the gapminder dataset using (among other tools) the `dplyr` and `ggplot` functions. First we load the gapminder dataset and the tidyverse package.
+```{r, results='hide'}
 library(gapminder)
 library(tidyverse)
 ```
@@ -29,7 +29,7 @@ is.list(gapminder)
 ```{r}
 class(gapminder)
 ```
- We see that `gapminder` is a data.frame, a tibble (`tbl`), and a tibble dataframe (`tbl_df`).
+ We see that `gapminder` is a `data.frame`, a tibble (`tbl`), and a tibble dataframe (`tbl_df`).
  
  * How many variables/columns?
 ```{r}
@@ -49,25 +49,26 @@ We can determine both the class and the number of rows & columns (among other in
 ```{r}
 str(gapminder)
 ```
- which also displays the class(es) of gapminder and the number of rows & columns.
+ which also displays the classes of gapminder and the number of rows & columns.
  
  * What data type is each variable?
  
- From above, we read off that *continent* and *country* are of `factor` type, *year* and *population* are `integer`, and *life expectancy* and *Gdp per capita* are `numerical`.
+ From above, we read off that *continent* and *country* are of `factor` type, *year* and *population* are `integer`, and *life expectancy* and *Gdp per capita* are `numbers`.
  
 
 
  
 ## Exploring a variable
-We shall pick, continent as a categorical variable and population as a quantitative one.
 
 
 * What are possible values (or range, whichever is appropriate) of each variable?
+For continent, population, and lifeExp, we have
 ```{r}
 distinct(select(gapminder, continent))
 range(select(gapminder, pop))
 range(select(gapminder, lifeExp))
 ```
+
 
 * What values are typical? What’s the spread? What’s the distribution? Etc., tailored to the variable at hand.
 
@@ -77,9 +78,11 @@ gapminder %>%
   select(pop, lifeExp) %>% 
   summary()
 ```
+For example, the typical life expectancy is around 60 years old.
+
 ## Plots
 
-Let's explore population visually, using log-scale.
+Let's explore population visually, using a log-scale histogram.
 ```{r}
 ggplot(gapminder, aes(pop)) +
   scale_x_log10() +
@@ -87,13 +90,14 @@ ggplot(gapminder, aes(pop)) +
   geom_density()
 ```
 
-Scatter plot of population with life expectancy across the five continents:
+Next, let's see how population varies with life expectancy across the five continents.
 ```{r}
 ggplot(gapminder, aes(lifeExp,pop))+
   geom_point(aes(colour=continent), alpha = 0.2) +
   scale_y_log10() +
   facet_wrap(~ continent)
 ```
+
 We see that in all continents and all countries in those continents, there appears to be a linear relation between population and life expectancy.
 
 Here is a violin plot overlayed with a jitter plot for life expectancy across continents:
@@ -107,7 +111,7 @@ gapminder %>%
   
 ```
 
-In the following, we create a (log) plot of population across multiple years in Austraila, New Zealand, and Canada.
+In the following, we would like to see a comparison between rate of population growth over the years in Canada, Australia, and New Zealand. 
 ```{r}
 gapminder %>% 
   filter(continent == "Oceania" | country == "Canada") %>% 
@@ -117,4 +121,46 @@ gapminder %>%
   geom_point() +
   geom_smooth(method ="lm")
 ```
-Here we see from a linear regression fit that the populations of Australia and Canada across the sampled years were increasing at about the same rate, while the population growth in New Zealand was slightly slower.
+
+Visually we estimate from the linear regression fit that the populations of Australia and Canada were increasing at about the same rate, while the population in New Zealand was increasing at a slightly slower rate.
+
+
+## But I want to do more!
+
+For people who want to take things further.
+
+Evaluate this code and describe the result. Presumably the analyst’s intent was to get the data for Rwanda and Afghanistan. Did they succeed? Why or why not? If not, what is the correct way to do this?
+
+`filter(gapminder, country == c("Rwanda", "Afghanistan"))`
+
+The output for this code is a 12 x 6 tibble. This code did not succeed in obtaining all the data for Rwanda and Afghanistan. It looks like what this code is doing is **checking equality two rows at a time** therefore missing half the data. For instance for the Rwanda years 1952 & 1957, it will check equality with`Rwanda` and
+`Afghanistan`, respectively. The Rwanda 1952 row will be evaluated as `true`, but the Rwanda 1957 row will be evaluated as `false` since it is compared to `Afghanistan`. 
+
+The following code is a correct way to obtain all the data.
+
+```{r, results='hide'}
+gapminder %>% 
+filter(country == "Rwanda" | country == "Afghanistan")
+```
+
+##Further fun with dplyr
+
+Some other commands which are useful in `dplyr` include the `rename` and `pull` command. The `pull` command allows to extract a single column as a vector.
+```{r, results='hide'}
+gapminder %>% 
+  pull(lifeExp)
+```
+
+The `rename` command as suggested allows you to rename columns.
+```{r, results='hide'}
+gpmdr <- gapminder %>% 
+  rename("NewName"= "lifeExp")
+```
+
+The `mutate` command allows you to create new variable from existing ones and add it to the data.frame.
+```{r}
+gapminder %>% 
+  mutate(lifeExp_with_chocolate_cake = lifeExp + 20)
+```
+
+

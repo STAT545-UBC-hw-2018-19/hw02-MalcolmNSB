@@ -1,7 +1,7 @@
 Exploring gapminder using dplyr and ggplot2
 ================
 
-In this document, we will be exploring the `gapminder` dataset using (among other tools) the `dplyr` and `ggplot2` functions. First we load the gapminder dataset and dplyr using the tidyverse package.
+In this document, we will be exploring the gapminder dataset using (among other tools) the `dplyr` and `ggplot` functions. First we load the gapminder dataset and the tidyverse package.
 
 ``` r
 library(gapminder)
@@ -60,7 +60,7 @@ class(gapminder)
 
     ## [1] "tbl_df"     "tbl"        "data.frame"
 
-We see that `gapminder` is a data.frame, a tibble (`tbl`), and a tibble dataframe (`tbl_df`).
+We see that `gapminder` is a `data.frame`, a tibble (`tbl`), and a tibble dataframe (`tbl_df`).
 
 -   How many variables/columns?
 
@@ -94,18 +94,16 @@ str(gapminder)
     ##  $ pop      : int  8425333 9240934 10267083 11537966 13079460 14880372 12881816 13867957 16317921 22227415 ...
     ##  $ gdpPercap: num  779 821 853 836 740 ...
 
-which also displays the class(es) of gapminder and the number of rows & columns.
+which also displays the classes of gapminder and the number of rows & columns.
 
 -   What data type is each variable?
 
-From above, we read off that *continent* and *country* are of `factor` type, *year* and *population* are `integer`, and *life expectancy* and *Gdp per capita* are `numerical`.
+From above, we read off that *continent* and *country* are of `factor` type, *year* and *population* are `integer`, and *life expectancy* and *Gdp per capita* are `numbers`.
 
 Exploring a variable
 --------------------
 
-We shall pick, continent as a categorical variable and population as a quantitative one.
-
--   What are possible values (or range, whichever is appropriate) of each variable?
+-   What are possible values (or range, whichever is appropriate) of each variable? For continent, population, and lifeExp, we have
 
 ``` r
 distinct(select(gapminder, continent))
@@ -150,10 +148,12 @@ gapminder %>%
     ##  3rd Qu.:1.959e+07   3rd Qu.:70.85  
     ##  Max.   :1.319e+09   Max.   :82.60
 
+For example, the typical life expectancy is around 60 years old.
+
 Plots
 -----
 
-Let's explore population visually, using log-scale.
+Let's explore population visually, using a log-scale histogram.
 
 ``` r
 ggplot(gapminder, aes(pop)) +
@@ -166,7 +166,7 @@ ggplot(gapminder, aes(pop)) +
 
 ![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
-Scatter plot of population with life expectancy across the five continents:
+Next, let's see how population varies with life expectancy across the five continents.
 
 ``` r
 ggplot(gapminder, aes(lifeExp,pop))+
@@ -175,7 +175,9 @@ ggplot(gapminder, aes(lifeExp,pop))+
   facet_wrap(~ continent)
 ```
 
-![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-10-1.png) We see that in all continents and all countries in those continents, there appears to be a linear relation between population and life expectancy.
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-10-1.png)
+
+We see that in all continents and all countries in those continents, there appears to be a linear relation between population and life expectancy.
 
 Here is a violin plot overlayed with a jitter plot for life expectancy across continents:
 
@@ -189,7 +191,7 @@ gapminder %>%
 
 ![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
-In the following, we create a (log) plot of population across multiple years in Austraila, New Zealand, and Canada.
+In the following, we would like to see a comparison between rate of population growth over the years in Canada, Australia, and New Zealand.
 
 ``` r
 gapminder %>% 
@@ -201,4 +203,63 @@ gapminder %>%
   geom_smooth(method ="lm")
 ```
 
-![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-12-1.png) Here we see from a linear regression fit that the populations of Australia and Canada across the sampled years were increasing at about the same rate, while the population growth in New Zealand was slightly slower.
+![](hw02_gapminder_dplyr_files/figure-markdown_github/unnamed-chunk-12-1.png)
+
+Visually we estimate from the linear regression fit that the populations of Australia and Canada were increasing at about the same rate, while the population in New Zealand was increasing at a slightly slower rate.
+
+But I want to do more!
+----------------------
+
+For people who want to take things further.
+
+Evaluate this code and describe the result. Presumably the analyst’s intent was to get the data for Rwanda and Afghanistan. Did they succeed? Why or why not? If not, what is the correct way to do this?
+
+`filter(gapminder, country == c("Rwanda", "Afghanistan"))`
+
+The output for this code is a 12 x 6 tibble. This code did not succeed in obtaining all the data for Rwanda and Afghanistan. It looks like what this code is doing is **checking equality two rows at a time** therefore missing half the data. For instance for the Rwanda years 1952 & 1957, it will check equality with`Rwanda` and `Afghanistan`, respectively. The Rwanda 1952 row will be evaluated as `true`, but the Rwanda 1957 row will be evaluated as `false` since it is compared to `Afghanistan`.
+
+The following code is a correct way to obtain all the data.
+
+``` r
+gapminder %>% 
+filter(country == "Rwanda" | country == "Afghanistan")
+```
+
+Further fun with dplyr
+----------------------
+
+Some other commands which are useful in `dplyr` include the `rename` and `pull` command. The `pull` command allows to extract a single column as a vector.
+
+``` r
+gapminder %>% 
+  pull(lifeExp)
+```
+
+The `rename` command as suggested allows you to rename columns.
+
+``` r
+gpmdr <- gapminder %>% 
+  rename("NewName"= "lifeExp")
+```
+
+The `mutate` command allows you to create new variable from existing ones and add it to the data.frame.
+
+``` r
+gapminder %>% 
+  mutate(lifeExp_with_chocolate_cake = lifeExp + 20)
+```
+
+    ## # A tibble: 1,704 x 7
+    ##    country   continent  year lifeExp     pop gdpPercap lifeExp_with_choco~
+    ##    <fct>     <fct>     <int>   <dbl>   <int>     <dbl>               <dbl>
+    ##  1 Afghanis~ Asia       1952    28.8  8.43e6      779.                48.8
+    ##  2 Afghanis~ Asia       1957    30.3  9.24e6      821.                50.3
+    ##  3 Afghanis~ Asia       1962    32.0  1.03e7      853.                52.0
+    ##  4 Afghanis~ Asia       1967    34.0  1.15e7      836.                54.0
+    ##  5 Afghanis~ Asia       1972    36.1  1.31e7      740.                56.1
+    ##  6 Afghanis~ Asia       1977    38.4  1.49e7      786.                58.4
+    ##  7 Afghanis~ Asia       1982    39.9  1.29e7      978.                59.9
+    ##  8 Afghanis~ Asia       1987    40.8  1.39e7      852.                60.8
+    ##  9 Afghanis~ Asia       1992    41.7  1.63e7      649.                61.7
+    ## 10 Afghanis~ Asia       1997    41.8  2.22e7      635.                61.8
+    ## # ... with 1,694 more rows
